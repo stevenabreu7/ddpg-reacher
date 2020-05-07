@@ -1,4 +1,6 @@
+from src.ddpg import AgentDDPG
 from collections import deque
+import json
 import numpy as np
 import os
 import matplotlib as mpl
@@ -6,10 +8,21 @@ import matplotlib.pyplot as plt
 import sys
 
 
-def run_ddpg_training(env, agent, n_episodes):
+def run_ddpg_training(env, agentParams, seed, n_episodes, folder):
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        os.makedirs(os.path.join(folder, "solved"))
+        os.makedirs(os.path.join(folder, "end"))
+    # save parameter file
+    d = json.dumps(agentParams, indent=2)
+    with open(os.path.join(folder, "params.json"), "w") as f:
+        f.write(d)
+    # create agent
+    agent = AgentDDPG(env, seed, **agentParams)
     brain_name = env.brain_names[0]
     scores = []
     scores_window = deque(maxlen=100)
+    print('\n...', end="")
     for i_episode in range(1, n_episodes+1):
         # reset agent's noise process
         agent.episode_step()
@@ -37,7 +50,9 @@ def run_ddpg_training(env, agent, n_episodes):
                 break
         scores.append(score)
         scores_window.append(score)
-        np.save("scores.npy", scores)
+        np.save(os.path.join(folder, "scores.npy"), scores)
+        with open(os.path.join(folder, "scores.txt"), "a") as f:
+            f.write("{:03} {}\n".format(i_episode, score))
         # print scores
         print('\repisode {}\t score: {:.4f}\taverage: {:.4f}'.format(
             i_episode, score, np.mean(scores_window)
@@ -46,7 +61,7 @@ def run_ddpg_training(env, agent, n_episodes):
         # check if solved
         if len(scores) > 100 and np.mean(scores_window) > 30:
             print("\nsolved environment!")
-            agent.save("solved")
-            break
-    agent.save("end")
+            agent.save(os.path.join(folder, "solved"))
+    agent.save(os.path.join(folder, "end"))
+    print()
     return scores
