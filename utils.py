@@ -19,7 +19,7 @@ def show_scores_plot(scores, folder, save_np=True, save_plot=True):
     scores = np.array([np.mean(scores[max(0, idx-window_size+1):idx+1]) for idx in range(len(scores))])
 
     # plot agent scores
-    plt.plot(np.arange(1, 101), scores[:100], linestyle="dashed", color="blue")
+    plt.plot(np.arange(1, min(101, len(scores)+1)), scores[:100], linestyle="dashed", color="blue")
     plt.plot(np.arange(101, len(scores)+1), scores[100:], color="blue", label="agent")
 
     # plot agent scores that solved environment

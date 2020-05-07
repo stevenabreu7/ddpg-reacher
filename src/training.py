@@ -19,7 +19,7 @@ def run_ddpg_training(env, agent, n_episodes):
         states = env_info.vector_observations
         # initialize score (for each agent)
         score = 0
-        while True:
+        for t in range(1000):
             # select action (for each agent)
             actions = agent.act(states)
             # execute actions
@@ -29,7 +29,7 @@ def run_ddpg_training(env, agent, n_episodes):
             rewards = env_info.rewards
             dones = env_info.local_done
             # learning step for the agent
-            agent.step(states, actions, rewards, next_states, dones)
+            agent.step(states[0], actions[0], rewards[0], next_states[0], dones[0])
             # update scores and states (for each agent)
             score += rewards[0]
             states = next_states

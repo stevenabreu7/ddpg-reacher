@@ -50,6 +50,11 @@ class Actor(nn.Module):
         for layer in self.hid_layers:
             layer.weight.data.uniform_(*hidden_init(layer))
         self.out_layer.weight.data.uniform_(self.lower_init, self.upper_init)
+        # bias
+        self.in_layer.bias.data.fill_(0.1)
+        for layer in self.hid_layers:
+            layer.bias.data.fill_(0.1)
+        self.out_layer.bias.data.fill_(0.1)
 
     def forward(self, state, out_act=torch.tanh):
         """ Forward pass of a state through the network to get an action.
@@ -106,6 +111,11 @@ class Critic(nn.Module):
         for layer in self.hid_layers:
             layer.weight.data.uniform_(*hidden_init(layer))
         self.out_layer.weight.data.uniform_(self.lower_init, self.upper_init)
+        # bias
+        self.in_layer.bias.data.fill_(0.1)
+        for layer in self.hid_layers:
+            layer.bias.data.fill_(0.1)
+        self.out_layer.bias.data.fill_(0.1)
 
     def forward(self, state, action):
         """ Forward pass of a state through the network to get a value.

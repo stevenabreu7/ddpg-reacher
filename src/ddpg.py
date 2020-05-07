@@ -108,12 +108,11 @@ class AgentDDPG:
 
         # time step
         self.cur_t += 1
-        
-        if self.cur_t % self.train_every == 0:
-            # learning step (if enough samples)
-            if len(self.memory) > self.batch_size:
-                experiences = self.memory.sample()
-                self.learn(experiences)
+
+        # learning step (if enough samples)
+        if len(self.memory) > self.batch_size:
+            experiences = self.memory.sample()
+            self.learn(experiences)
     
     def learn(self, experiences):
         """ Update actor and critic network parameters with batch of experience tuples.
@@ -134,7 +133,8 @@ class AgentDDPG:
         # critic - minimize loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
+        # TODO gradient clipping?
+        # torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.critic_optimizer.step()
 
         # actor - compute loss
@@ -146,8 +146,17 @@ class AgentDDPG:
         self.actor_optimizer.step()
 
         # update target networks
+        # if self.cur_t % self.train_every == 0:
         self.soft_update(self.critic_local, self.critic_target)
         self.soft_update(self.actor_local, self.actor_target)
+        if self.cur_t == 1:
+            # TODO hard updates?
+            self.hard_update(self.critic_local, self.critic_target)
+            self.hard_update(self.actor_local, self.actor_target)
+        
+    def hard_update(self, local_net, target_net):
+        for target_param, source_param in zip(target_net.parameters(), local_net.parameters()):
+            target_param.data.copy_(source_param.data)
     
     def soft_update(self, local_net, target_net):
         """ Soft update model parameters, using interpolation parameter tau (class property).
