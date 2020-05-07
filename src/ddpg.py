@@ -16,7 +16,7 @@ class AgentDDPG:
     def __init__(self, env, seed, actor_arch=[512, 256, 128], critic_arch=[512, 256, 128], buffer_size=int(1e5), \
                 batch_size=128, lr_actor=1e-4, lr_critic=1e-3, gamma=0.99, tau=0.001, noise_mu=0.0, noise_sigma=0.2, \
                 noise_theta=0.15, noise_decay=0.99, noise_min_sigma=0.01, weight_decay_critic=0.0, weight_decay_actor=0.0, \
-                train_every=1):
+                soft_update_freq=1, hard_update_at_t=1000, gradient_clipping=True):
         """ Create a new DDPG Agent instance.
         
         Params:
@@ -49,7 +49,9 @@ class AgentDDPG:
 
         # agent hyperparameters
         self.batch_size = batch_size
-        self.train_every = train_every
+        self.soft_update_freq = soft_update_freq
+        self.hard_update_at_t = hard_update_at_t
+        self.gradient_clipping = gradient_clipping
         self.gamma = gamma
         self.tau = tau
 
@@ -133,8 +135,8 @@ class AgentDDPG:
         # critic - minimize loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        # TODO gradient clipping?
-        # torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
+        if self.gradient_clipping:
+            torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)
         self.critic_optimizer.step()
 
         # actor - compute loss
@@ -143,14 +145,15 @@ class AgentDDPG:
         # actor - minimize loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
+        if self.gradient_clipping:
+            torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1)
         self.actor_optimizer.step()
 
         # update target networks
-        # if self.cur_t % self.train_every == 0:
-        self.soft_update(self.critic_local, self.critic_target)
-        self.soft_update(self.actor_local, self.actor_target)
-        if self.cur_t == 1:
-            # TODO hard updates?
+        if self.cur_t % self.soft_update_freq == 0:
+            self.soft_update(self.critic_local, self.critic_target)
+            self.soft_update(self.actor_local, self.actor_target)
+        if self.cur_t == self.hard_update_at_t:
             self.hard_update(self.critic_local, self.critic_target)
             self.hard_update(self.actor_local, self.actor_target)
         
@@ -168,7 +171,7 @@ class AgentDDPG:
         for local_param, target_param in zip(local_net.parameters(), target_net.parameters()):
             target_param.data.copy_(self.tau * local_param.data + (1. - self.tau) * target_param.data)
     
-    def save(self, folder=None):
+    def save(self, folder):
         """ Save the current parameters.
         """
         if not folder:
