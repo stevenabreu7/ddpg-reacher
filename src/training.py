@@ -9,6 +9,7 @@ import sys
 
 
 def run_ddpg_training(env, agentParams, seed, n_episodes, folder):
+    print("\n" + folder + "\n")
     if not os.path.exists(folder):
         os.makedirs(folder)
         os.makedirs(os.path.join(folder, "solved"))
