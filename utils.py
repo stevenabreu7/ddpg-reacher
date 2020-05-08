@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 
 
-def show_scores_plot(scores, folder, save_np=True, save_plot=True):
+def show_scores_plot(scores, folder, save_np=True, save_plot=True, show_goal=True):
     """Show the scores plot and optionally save the plot.
         
     Params:
@@ -28,7 +28,8 @@ def show_scores_plot(scores, folder, save_np=True, save_plot=True):
     plt.plot(np.arange(1, len(scores)+1), win_scores, color="orange", label="solved")
 
     # marker for target score (solution)
-    plt.hlines(30, 1, len(scores), colors=["red"], linestyles=["dashed"], label="goal")
+    if show_goal:
+        plt.hlines(30, 1, len(scores), colors=["red"], linestyles=["dashed"], label="goal")
 
     # marker for episode when solution was first found
     ep_solve = np.argmax(np.array(scores) > 13)
