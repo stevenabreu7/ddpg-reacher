@@ -224,7 +224,7 @@ class AgentDDPG:
         torch.save(self.critic_target.state_dict(), os.path.join(folder, "critic_target.pth"))
 
     def load_weights(self, folder_path):
-        self.actor_local.load_state_dict(torch.load(os.path.join(folder_path, "actor_local.pth")))
-        self.actor_target.load_state_dict(torch.load(os.path.join(folder_path, "actor_target.pth")))
-        self.critic_local.load_state_dict(torch.load(os.path.join(folder_path, "critic_local.pth")))
-        self.critic_target.load_state_dict(torch.load(os.path.join(folder_path, "critic_target.pth")))
+        self.actor_local.load_state_dict(torch.load(os.path.join(folder_path, "actor_local.pth"), map_location=torch.device('cpu')))
+        self.actor_target.load_state_dict(torch.load(os.path.join(folder_path, "actor_target.pth"), map_location=torch.device('cpu')))
+        self.critic_local.load_state_dict(torch.load(os.path.join(folder_path, "critic_local.pth"), map_location=torch.device('cpu')))
+        self.critic_target.load_state_dict(torch.load(os.path.join(folder_path, "critic_target.pth"), map_location=torch.device('cpu')))
