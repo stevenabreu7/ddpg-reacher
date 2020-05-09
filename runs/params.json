@@ -1,0 +1,26 @@
+{
+  "actor_arch": [
+    256,
+    128
+  ],
+  "critic_arch": [
+    256,
+    128
+  ],
+  "buffer_size": 100000,
+  "batch_size": 512,
+  "lr_actor": 0.001,
+  "lr_critic": 0.001,
+  "gamma": 0.99,
+  "tau": 0.001,
+  "noise_mu": 0.0,
+  "noise_sigma": 0.2,
+  "noise_decay": 0.998,
+  "noise_min_sigma": 0.01,
+  "noise_theta": 0.15,
+  "weight_decay_critic": 0.0,
+  "weight_decay_actor": 0.0,
+  "soft_update_freq": 5,
+  "hard_update_at_t": -1,
+  "gradient_clipping": false
+}
