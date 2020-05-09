@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from collections import deque
+
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -77,13 +79,50 @@ class AgentDDPG:
         self.critic_local = Critic(self.state_size, self.action_size, self.seed, n_hidden_units=self.actor_arch).to(device)
         self.critic_target = Critic(self.state_size, self.action_size, self.seed, n_hidden_units=self.actor_arch).to(device)
         self.critic_optimizer = torch.optim.Adam(self.critic_local.parameters(), lr=self.lr_critic, weight_decay=self.l2_critic)
+        self.only_critic_training = False
     
-    def episode_step(self):
+    def pre_train_critic(self, n_episodes):
+        self.only_critic_training = True
+        scores = []
+        scores_window = deque(maxlen=100)
+        for i_episode in range(1, n_episodes+1):
+            # episode step
+            self.episode_step(decay_noise=False)
+            # reset env
+            env_info = self.env.reset(train_mode=True)[self.brain_name]
+            # get state
+            states = env_info.vector_observations
+            score = 0
+            for t in range(1000):
+                actions = np.random.randn(self.action_size)
+                env_info = self.env.step(actions)[self.brain_name]
+                next_states = env_info.vector_observations
+                rewards = env_info.rewards
+                dones = env_info.local_done
+                self.step(states[0], actions[0], rewards[0], next_states[0], dones[0])
+                score += rewards[0]
+                states = next_states
+                if np.any(dones):
+                    break
+            scores.append(score)
+            scores_window.append(score)
+            # print scores
+            print('\r[pre] episode {}\t score: {:.4f}\taverage: {:.4f}'.format(
+                i_episode, score, np.mean(scores_window)
+            ), end="\n" if i_episode % 100 == 0 else "")
+            sys.stdout.flush()
+        self.only_critic_training = False
+        # reset memory?
+        print()
+        return scores
+    
+    def episode_step(self, decay_noise=True):
         """ Reset agent for new episode. Reset noise, update params.
         """
         self.cur_t = 0
         self.noise.reset()
-        self.noise.decay_step()
+        if decay_noise:
+            self.noise.decay_step()
     
     def act(self, state, add_noise=True):
         """ Returns action for given state, following current Actor policy.
@@ -183,3 +222,9 @@ class AgentDDPG:
         torch.save(self.actor_target.state_dict(), os.path.join(folder, "actor_target.pth"))
         torch.save(self.critic_local.state_dict(), os.path.join(folder, "critic_local.pth"))
         torch.save(self.critic_target.state_dict(), os.path.join(folder, "critic_target.pth"))
+
+    def load_weights(self, folder_path):
+        self.actor_local.load_state_dict(torch.load(os.path.join(folder_path, "actor_local.pth")))
+        self.actor_target.load_state_dict(torch.load(os.path.join(folder_path, "actor_target.pth")))
+        self.critic_local.load_state_dict(torch.load(os.path.join(folder_path, "critic_local.pth")))
+        self.critic_target.load_state_dict(torch.load(os.path.join(folder_path, "critic_target.pth")))

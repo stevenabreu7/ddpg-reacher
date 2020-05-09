@@ -59,6 +59,11 @@ def run_ddpg_training(env, agentParams, seed, n_episodes, folder):
             i_episode, score, np.mean(scores_window)
         ), end="\n" if i_episode % 100 == 0 else "")
         sys.stdout.flush()
+
+        # save the model every 100 episodes
+        if i_episode % 100 == 0:
+            agent.save(os.path.join(folder, "params_{}".format(i_episode)))
+
         # check if solved
         if len(scores) > 100 and np.mean(scores_window) > 30:
             print("\nsolved environment!")

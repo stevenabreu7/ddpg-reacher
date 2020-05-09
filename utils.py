@@ -24,7 +24,7 @@ def show_scores_plot(scores, folder, save_np=True, save_plot=True, show_goal=Tru
 
     # plot agent scores that solved environment
     win_scores = scores.copy()
-    win_scores[win_scores < 13] = np.nan
+    win_scores[win_scores < 30] = np.nan
     plt.plot(np.arange(1, len(scores)+1), win_scores, color="orange", label="solved")
 
     # marker for target score (solution)
@@ -32,10 +32,10 @@ def show_scores_plot(scores, folder, save_np=True, save_plot=True, show_goal=Tru
         plt.hlines(30, 1, len(scores), colors=["red"], linestyles=["dashed"], label="goal")
 
     # marker for episode when solution was first found
-    ep_solve = np.argmax(np.array(scores) > 13)
+    ep_solve = np.argmax(np.array(scores) > 30)
     ep_solve = ep_solve
     if ep_solve:
-        plt.vlines(ep_solve, 0, max(max(scores), 13), colors=["green"], linestyles=["dashed"], label="solution")
+        plt.vlines(ep_solve, 0, max(max(scores), 30), colors=["green"], linestyles=["dashed"], label="solution")
         plt.annotate("{}".format(ep_solve), (ep_solve - len(scores) / 15, 4.0))
 
     # labels and legend
