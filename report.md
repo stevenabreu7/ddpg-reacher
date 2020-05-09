@@ -30,33 +30,6 @@ The second version is useful for algorithms like [PPO](https://arxiv.org/pdf/170
 
 **Option 2: Solve the Second Version.** The barrier for solving the second version of the environment is slightly different, to take into account the presence of many agents. In particular, the agents must get an average score of +30 (over 100 consecutive episodes, and *averaged* over all agents).
 
-## Installation
-
-This project is using Python 3.6.3, make sure the following packages are installed:
-
-```bash
-pip install numpy matplotlib torch setuptools bleach==1.5.0 unityagents
-```
-
-Download the environment from one of the links below:
-- **Version 1: One (1) Agent**
-    - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux.zip)
-    - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher.app.zip)
-    - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86.zip)
-    - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86_64.zip)
-
-- **_Version 2: Twenty (20) Agents_**
-    - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux.zip)
-    - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher.app.zip)
-    - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86.zip)
-    - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86_64.zip)
-
-Place the downloaded file(s) in the `src/exec/` folder, and unzip (or decompress) the file. Make sure to update the `file_name` parameter in the code when loading the environment:
-
-```python
-env = UnityEnvironment(file_name="src/exec/...")
-```
-
 ## Training instructions
 
 Follow the code in [`script.py`](./script.py) to see how an agent can be trained.
