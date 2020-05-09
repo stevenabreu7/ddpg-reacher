@@ -103,7 +103,7 @@ class Critic(nn.Module):
         self.action_size = action_size
 
         self.in_layer = nn.Linear(state_size, n_hidden_units[0])
-        if self.batch_norm
+        if self.batch_norm:
             self.in_layer_bn = nn.BatchNorm1d(n_hidden_units[0])
         hid_layers = [
             nn.Linear(n_hidden_units[0] + action_size, n_hidden_units[1])
